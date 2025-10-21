@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Configurations>Debug NCAD;Release NCAD</Configurations>
+        <OutputPath>$(SolutionDir)bin-$(Platform)\$(Configuration)</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+        <UseWindowsForms>true</UseWindowsForms>
+        <DefineConstants>$(DefineConstants)TRACE;NCAD</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="hostdbmgd">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\hostdbmgd.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="hostmgd">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\hostmgd.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="imapimgd">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\imapimgd.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="MapiBaseTypes">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\mapibasetypes.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="mapimgd">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\mapimgd.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GraphBuilder.BL\GraphBuilder.BL.csproj"/>
+    </ItemGroup>
+
+</Project>
