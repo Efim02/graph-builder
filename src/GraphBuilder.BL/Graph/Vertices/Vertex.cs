@@ -1,11 +1,11 @@
-﻿namespace GraphBuilder.BL.Models;
+﻿namespace GraphBuilder.BL.Graph.Vertices;
 
 /// <summary>
 /// DTO для вершины графа.
 /// </summary>
-public class GraphVertexDto
+public class Vertex
 {
-    public GraphVertexDto(long id, double x, double y)
+    public Vertex(long id, double x, double y)
     {
         Id = id;
         X = x;
@@ -13,12 +13,14 @@ public class GraphVertexDto
     }
 
     public long Id { get; set; }
+
     public double X { get; set; }
+
     public double Y { get; set; }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return obj is GraphVertexDto dto && Id == dto.Id;
+        return obj is Vertex dto && Id == dto.Id;
     }
 
     public override int GetHashCode()

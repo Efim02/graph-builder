@@ -1,6 +1,6 @@
 ﻿namespace GraphBuilder.Ncad.Commands;
 
-using GraphBuilder.Ncad.CadObjects;
+using GraphBuilder.Ncad.CustomEntities;
 
 using Multicad;
 using Multicad.DatabaseServices;
@@ -14,10 +14,10 @@ public class CreateGraphVertexCommand
     [CommandMethod("GB_SIMPLE_GRAPH", CommandFlags.NoCheck | CommandFlags.NoPrefix)]
     public static void BuildSimpleGraphCmd()
     {
-        GraphVertex lastVertex = null;
+        CadGraphVertex? lastVertex = null;
         while (true)
         {
-            var vertex = new GraphVertex();
+            var vertex = new CadGraphVertex();
             var result = vertex.PlaceObject();
 
             if (result != hresult.s_Ok)
@@ -25,7 +25,7 @@ public class CreateGraphVertexCommand
 
             if (lastVertex != null)
             {
-                var edge = new GraphEdge(lastVertex.ID, vertex.ID);
+                var edge = new CadGraphEdge(lastVertex.ID, vertex.ID);
                 edge.DbEntity.AddToCurrentDocument();
             }
 
