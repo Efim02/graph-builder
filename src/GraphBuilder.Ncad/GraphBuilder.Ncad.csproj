@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Configurations>Debug NCAD;Release NCAD</Configurations>
-        <OutputPath>$(SolutionDir)bin-$(Platform)\$(Configuration)</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-        <UseWindowsForms>true</UseWindowsForms>
+        <Configurations>Debug;Release</Configurations>
+<!--        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>-->
+<!--        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>-->
         <DefineConstants>$(DefineConstants)TRACE;NCAD</DefineConstants>
     </PropertyGroup>
 

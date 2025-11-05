@@ -1,5 +1,7 @@
 ﻿namespace GraphBuilder.Ncad.CustomEntities;
 
+using System.Drawing;
+
 using GraphBuilder.Ncad.Abstractions;
 
 using Multicad;
@@ -12,13 +14,14 @@ using Multicad.Runtime;
 /// <summary>
 /// Ребро графа.
 /// </summary>
-[CustomEntity("2F76680E-5FEA-4DC2-B250-39044FB21E58", "GB_GraphEdge", "Graph edge")]
+[CustomEntity("2F76680E-5FEA-4DC2-B250-39044FB21E58", "GB_GraphEdge", "Ребро графа")]
 public class CadGraphEdge : McCustomBase, IVertexObserver
 {
     private double _cachedLength = -1;
     private McObjectId _endVertexId;
     private List<Point3d> _intermediatePoints = new();
     private McObjectId _startVertexId;
+    private bool _isSelected;
 
     public CadGraphEdge()
     {
@@ -56,6 +59,19 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
             if (_cachedLength < 0)
                 _cachedLength = CalculateLength();
             return _cachedLength;
+        }
+    }
+
+    /// <summary>
+    /// Выделено ли ребро.
+    /// </summary>
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            TryModify(0);
+            _isSelected = value;
         }
     }
 
@@ -108,16 +124,23 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
     }
 
     /// <inheritdoc />
-    public override void OnDraw(GeometryBuilder dc)
+    public override void OnDraw(GeometryBuilder builder)
     {
-        dc.Clear();
-        dc.Color = Colors.ByObject;
-        dc.LineType = LineTypes.ByObject;
-        dc.LineWidth = LineWeights.ByObject;
+        builder.Clear();
 
         var points = GetEdgePoints();
-        if (points.Count > 1)
-            dc.DrawPolyline(points.ToArray());
+        if (points.Count <= 1)
+            return;
+        
+        builder.LineType = LineTypes.ByObject;
+        builder.LineWidth = LineWeights.ByObject;
+        builder.DrawPolyline(points.ToArray());
+
+        if (IsSelected)
+        {
+            builder.Color = Color.Yellow;
+            builder.DrawPolyline(points.ToArray());
+        }
     }
 
     /// <inheritdoc />
@@ -128,11 +151,16 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
     }
 
     /// <inheritdoc />
-    public override hresult OnMcDeserialization(McSerializationInfo info)
+    public override hresult OnMcDeserialization(McSerializationInfo? info)
     {
+        if (null == info)
+            return hresult.e_InvalidArg;
+        
         if (!info.GetValue(nameof(_startVertexId), out _startVertexId))
             return hresult.e_Fail;
         if (!info.GetValue(nameof(_endVertexId), out _endVertexId))
+            return hresult.e_Fail;
+        if (!info.GetValue(nameof(_isSelected), out _isSelected))
             return hresult.e_Fail;
         if (!info.GetValue(nameof(_intermediatePoints), out Point3d[] points))
             return hresult.e_Fail;
@@ -144,10 +172,14 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
     }
 
     /// <inheritdoc />
-    public override hresult OnMcSerialization(McSerializationInfo info)
+    public override hresult OnMcSerialization(McSerializationInfo? info)
     {
+        if (null == info)
+            return hresult.e_InvalidArg;
+        
         info.Add(nameof(_startVertexId), _startVertexId);
         info.Add(nameof(_endVertexId), _endVertexId);
+        info.Add(nameof(_isSelected), _isSelected);
         info.Add(nameof(_intermediatePoints), _intermediatePoints.ToArray());
 
         return hresult.s_Ok;
@@ -206,7 +238,7 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
             DbEntity?.Erase();
             return;
         }
-
+        
         InvalidateLength();
         DbEntity?.Update();
     }

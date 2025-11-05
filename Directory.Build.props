@@ -4,5 +4,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Platforms>x64</Platforms>
+        <OutputPath>$(SolutionDir)\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
 </Project>

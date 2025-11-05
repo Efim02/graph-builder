@@ -10,8 +10,8 @@ using Multicad.Runtime;
 /// </summary>
 public class CreateGraphEdgeCommand
 {
-    [CommandMethod("GB_GRAPH_EDGE", CommandFlags.NoCheck | CommandFlags.NoPrefix)]
-    public static void GraphEdgeCmd()
+    [CommandMethod("GB_CREATE_GRAPH_EDGE", CommandFlags.NoCheck | CommandFlags.NoPrefix)]
+    public static void CreateGraphEdge()
     {
         var edge = new CadGraphEdge();
         edge.PlaceObject();

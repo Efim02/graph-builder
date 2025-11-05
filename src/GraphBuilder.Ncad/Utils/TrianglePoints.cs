@@ -38,9 +38,9 @@ public class TrianglePoints
     /// <summary>
     /// В точки
     /// </summary>
-    public Point3d[] ToArrayPoints()
+    public Point3d[] ToClosestArrayPoints()
     {
-        return new[] { A, B, C };
+        return new[] { A, B, C, A };
     }
 
     /// <summary>

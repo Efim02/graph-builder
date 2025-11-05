@@ -1,0 +1,15 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="NanoCAD 25.0" type="RunExe" factoryName=".NET Executable">
+    <option name="EXE_PATH" value="$PROJECT_DIR$/../../../../../Program Files/Nanosoft/nanoCAD x64 25.0/nCad.exe" />
+    <option name="PROGRAM_PARAMETERS" value="-g &quot;C:\Users\ZhabinEM\Documents\repos\graph-builder\bin\Debug\net6.0-windows\GraphBuilder.Ncad.dll&quot;" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../../../Program Files/Nanosoft/nanoCAD x64 25.0/" />
+    <option name="PASS_PARENT_ENVS" value="1" />
+    <option name="USE_EXTERNAL_CONSOLE" value="0" />
+    <option name="USE_MONO" value="0" />
+    <option name="RUNTIME_ARGUMENTS" value="" />
+    <option name="RUNTIME_TYPE" value="coreclr" />
+    <method v="2">
+      <option name="Build Solution" enabled="true" />
+    </method>
+  </configuration>
+</component>

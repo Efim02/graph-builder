@@ -1,5 +1,7 @@
 ﻿namespace GraphBuilder.Ncad.CustomEntities;
 
+using System.Drawing;
+
 using GraphBuilder.Ncad.Abstractions;
 using GraphBuilder.Ncad.Utils;
 
@@ -13,7 +15,7 @@ using Multicad.Runtime;
 /// <summary>
 /// Cad-объект вершины графа
 /// </summary>
-[CustomEntity("B31FD339-831A-4D4E-951F-A62EC5E23917", "GB_GraphVertex", "Graph vertex")]
+[CustomEntity("B31FD339-831A-4D4E-951F-A62EC5E23917", "GB_GraphVertex", "Вершина графа")]
 public class CadGraphVertex : McCustomBase, IVertexObservable
 {
     private const int RADIUS = 200;
@@ -21,7 +23,21 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
     private readonly List<IVertexObserver> _observers = new();
 
     public Point3d CenterPoint = new(0, 0, 0);
-    private GraphVertexForm _graphVertexForm = GraphVertexForm.Triangle;
+    private VertexFormKind _vertexFormKind = VertexFormKind.Triangle;
+    private bool _isSelected;
+
+    /// <summary>
+    /// Выделена ли точка.
+    /// </summary>
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            TryModify(0);
+            _isSelected = value;
+        }
+    }
 
     /// <inheritdoc />
     public void AddObserver(IVertexObserver observer)
@@ -68,22 +84,31 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
     }
 
     /// <inheritdoc />
-    public override void OnDraw(GeometryBuilder dc)
+    public override void OnDraw(GeometryBuilder builder)
     {
-        dc.Clear();
-        dc.LineType = LineTypes.ByObject;
-        dc.LineWidth = LineWeights.ByObject;
-
-        if (_graphVertexForm == GraphVertexForm.Circle)
+        builder.Clear();
+        
+        builder.LineType = LineTypes.ByObject;
+        builder.LineWidth = LineWeights.ByObject;
+        
+        if (_vertexFormKind == VertexFormKind.Circle)
         {
-            dc.Color = Color.Blue;
-            dc.DrawCircle(CenterPoint, RADIUS);
-            return;
+            builder.Color = Color.Blue;
+            builder.DrawCircle(CenterPoint, RADIUS);
         }
 
-        dc.Color = Color.Red;
-        var trianglePoints = TrianglePoints.CreateTrianglePointsByRadius(CenterPoint, RADIUS);
-        dc.DrawPolyline(trianglePoints.ToArrayPoints());
+        if (_vertexFormKind == VertexFormKind.Triangle)
+        {
+            builder.Color = Color.Red;
+            var trianglePoints = TrianglePoints.CreateTrianglePointsByRadius(CenterPoint, RADIUS);
+            builder.DrawPolyline(trianglePoints.ToClosestArrayPoints());
+        }
+        
+        if (IsSelected)
+        {
+            builder.Color = Color.Yellow;
+            builder.DrawCircle(CenterPoint, RADIUS * 1.1d);
+        }
     }
 
     /// <inheritdoc />
@@ -98,10 +123,10 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
     {
         if (!info.GetValue(nameof(CenterPoint), out CenterPoint))
             return hresult.e_Fail;
-        if (!info.GetValue(nameof(_graphVertexForm), out int vertexFormType))
+        if (!info.GetValue(nameof(_vertexFormKind), out int vertexFormType))
             return hresult.e_Fail;
 
-        _graphVertexForm = GetGraphVertexForm(vertexFormType);
+        _vertexFormKind = GetGraphVertexForm(vertexFormType);
         return hresult.s_Ok;
     }
 
@@ -109,7 +134,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
     public override hresult OnMcSerialization(McSerializationInfo info)
     {
         info.Add(nameof(CenterPoint), CenterPoint);
-        info.Add(nameof(_graphVertexForm), (int)_graphVertexForm);
+        info.Add(nameof(_vertexFormKind), (int)_vertexFormKind);
 
         return hresult.s_Ok;
     }
@@ -139,7 +164,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
             return hresult.e_Fail;
 
         CenterPoint = pointInputResult.Point;
-        _graphVertexForm = GetGraphVertexForm(graphVertexFormType);
+        _vertexFormKind = GetGraphVertexForm(graphVertexFormType);
 
         DbEntity.AddToCurrentDocument();
         jig.ExcludeObject(ID);
@@ -159,8 +184,8 @@ public class CadGraphVertex : McCustomBase, IVertexObservable
     /// <summary>
     /// Возвращает enum-представление формы вершины по её номеру.
     /// </summary>
-    private GraphVertexForm GetGraphVertexForm(int type)
+    private VertexFormKind GetGraphVertexForm(int type)
     {
-        return type == 1 ? GraphVertexForm.Circle : GraphVertexForm.Triangle;
+        return type == 1 ? VertexFormKind.Circle : VertexFormKind.Triangle;
     }
 }
