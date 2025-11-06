@@ -43,7 +43,7 @@ public interface IVertexObservable
     void NotifyMoved();
 
     /// <summary>
-    /// Уведомляет о удалении.
+    /// Уведомляет об удалении.
     /// </summary>
     void NotifyErased();
 }

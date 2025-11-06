@@ -15,7 +15,7 @@ using Multicad.Runtime;
 /// Ребро графа.
 /// </summary>
 [CustomEntity("2F76680E-5FEA-4DC2-B250-39044FB21E58", "GB_GraphEdge", "Ребро графа")]
-public class CadGraphEdge : McCustomBase, IVertexObserver
+public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
 {
     private double _cachedLength = -1;
     private McObjectId _endVertexId;
@@ -306,11 +306,11 @@ public class CadGraphEdge : McCustomBase, IVertexObserver
     /// <summary>
     /// Регестрирует вершины.
     /// </summary>
-    private void RegisterWithVertices()
+    public void RegisterWithVertices()
     {
         var startVertex = GetStartVertex();
         var endVertex = GetEndVertex();
-
+        
         startVertex?.AddObserver(this);
         endVertex?.AddObserver(this);
 

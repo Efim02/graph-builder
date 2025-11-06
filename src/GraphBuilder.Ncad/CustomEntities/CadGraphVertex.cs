@@ -16,7 +16,7 @@ using Multicad.Runtime;
 /// Cad-объект вершины графа
 /// </summary>
 [CustomEntity("B31FD339-831A-4D4E-951F-A62EC5E23917", "GB_GraphVertex", "Вершина графа")]
-public class CadGraphVertex : McCustomBase, IVertexObservable
+public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
 {
     private const int RADIUS = 200;
 

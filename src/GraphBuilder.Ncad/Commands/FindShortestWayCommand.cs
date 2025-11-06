@@ -37,17 +37,11 @@ public class FindShortestWayCommand
             if (!findArgs.Success)
                 return;
 
-            var objectFilter = new ObjectFilter(true)
-            {
-                AllObjects = true,
-            };
-            var allObjectsIds = objectFilter.GetObjects();
-            var allObjects = allObjectsIds.Select(McObjectManager.GetObject).ToList();
+            var loadProjectResult = LoadProjectResult.Load();
+            var cadGraphVertices = loadProjectResult.GraphVertices;
+            var cadGraphEdges = loadProjectResult.GraphEdges;
 
-            var cadGraphVertices = allObjects.OfType<CadGraphVertex>().ToList();
-            var cadGraphEdges = allObjects.OfType<CadGraphEdge>().ToList();
-
-            var vertices = cadGraphVertices
+            var graphVertices = cadGraphVertices
                 .Select(x => new GraphVertex(x.ID.Handle, x.CenterPoint.X, x.CenterPoint.Y))
                 .ToList();
             var graphEdges = cadGraphEdges
@@ -55,7 +49,7 @@ public class FindShortestWayCommand
                 .ToList();
 
             var pathFinder = new SimpleGraphPathFinder();
-            pathFinder.Initialize(vertices, graphEdges);
+            pathFinder.Initialize(graphVertices, graphEdges);
 
             var foundCadVertices = pathFinder.FindShortestPath(findArgs.StartVertexId, findArgs.EndVertexId)
                 .SelectById(cadGraphVertices);
