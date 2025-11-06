@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Windows;
 
 using GraphBuilder.Ncad.Extensions;
+using GraphBuilder.Ncad.Models;
+using GraphBuilder.Ncad.Services;
 using GraphBuilder.Ncad.Utils;
 using GraphBuilder.Ncad.Views.Edge;
 
@@ -28,15 +30,6 @@ public class EditGraphEdgeStyleCommand
     [CommandMethod("GB_EDIT_GRAPH_EDGE_STYLE", CommandFlags.NoCheck | CommandFlags.NoPrefix)]
     public static void EditGraphEdgeStyle() => SafeUtils.Execute(() =>
     {
-        var loadProjectResult = LoadProjectResult.Load();
-        var edges = loadProjectResult.GraphEdges;
-
-        if (!edges.Any())
-        {
-            MessageBox.Show("Отсутствуют ребра графа", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
         using var transaction = CurrentDocument.Database.TransactionManager.StartTransaction();
         var linetypeTable = (LinetypeTable)CurrentDocument.Database.LinetypeTableId.GetObject(OpenMode.ForRead);
         var lineTypeNames = linetypeTable.Cast<ObjectId>()
@@ -44,32 +37,41 @@ public class EditGraphEdgeStyleCommand
             .Select(record => record.Name)
             .ToList();
 
-        var firstEdge = edges.First();
+        var edgeStyleService = new GraphEdgeStyleService();
+        var style = edgeStyleService.Load();
         var editEdgeStyleVM = new EditEdgeStyleVM
         {
             LineTypeNames = lineTypeNames,
-            LineTypeName = firstEdge.LineType,
-            LineThickness = firstEdge.LineThickness,
+            LineTypeName = style.LineType,
+            LineThickness = style.LineThickness,
             LineColor = System.Windows.Media.Color.FromArgb(
-                firstEdge.LineColor.A, 
-                firstEdge.LineColor.R,
-                firstEdge.LineColor.G, 
-                firstEdge.LineColor.B),
+                style.LineColor.A, 
+                style.LineColor.R,
+                style.LineColor.G, 
+                style.LineColor.B),
         };
         
         var editEdgeStyleWindow = new EditEdgeStyleWindow() {DataContext = editEdgeStyleVM};
         if (editEdgeStyleWindow.ShowDialog(McContext.MainWindowHandle) != true)
             return;
-        
-        edges.ForEach(edge =>
+
+        var newStyle = new GraphEdgeStyle
         {
-            edge.LineType = editEdgeStyleVM.LineTypeName;
-            edge.LineThickness = editEdgeStyleVM.LineThickness;
-            edge.LineColor = Color.FromArgb(
+            LineType = editEdgeStyleVM.LineTypeName,
+            LineThickness = editEdgeStyleVM.LineThickness,
+            LineColor = Color.FromArgb(
                 editEdgeStyleVM.LineColor.A, 
                 editEdgeStyleVM.LineColor.R, 
                 editEdgeStyleVM.LineColor.G,
-                editEdgeStyleVM.LineColor.B);
+                editEdgeStyleVM.LineColor.B)
+        };
+        edgeStyleService.Save(newStyle);
+        
+        LoadProjectResult.Load().GraphEdges.ForEach(edge =>
+        {
+            edge.LineType = newStyle.LineType;
+            edge.LineThickness = newStyle.LineThickness;
+            edge.LineColor = newStyle.LineColor;
         });
         
         transaction.Commit();

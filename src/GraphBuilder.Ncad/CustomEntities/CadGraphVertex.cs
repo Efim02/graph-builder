@@ -168,7 +168,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
         var jig = new InputJig();
 
         // Выбор типа вершины
-        var res = jig.GetIntNumber("Выберите тип объекта(1 круг, остальное или enter - треугольник):",
+        var res = jig.GetIntNumber("Выберите тип объекта(1 - треугольник, 2 - круг):",
             out var graphVertexFormType);
         if (!res)
             return hresult.e_Fail;
@@ -212,5 +212,12 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     /// <summary>
     /// Возвращает enum-представление формы вершины по её номеру.
     /// </summary>
-    private VertexFormKind GetGraphVertexForm(int type) => type == 1 ? VertexFormKind.Circle : VertexFormKind.Triangle;
+    private VertexFormKind GetGraphVertexForm(int type)
+    {
+        return type switch
+        {
+            1 => VertexFormKind.Triangle,
+            _ => VertexFormKind.Circle,
+        };
+    }
 }

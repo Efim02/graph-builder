@@ -3,6 +3,7 @@
 using System.Drawing;
 
 using GraphBuilder.Ncad.Abstractions;
+using GraphBuilder.Ncad.Models;
 
 using Multicad;
 using Multicad.Constants;
@@ -356,4 +357,14 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     /// Проверяет, является ли ребро "Висячим"
     /// </summary>
     private bool IsOrphanedEdge() => GetStartVertex() == null || GetEndVertex() == null;
+
+    /// <summary>
+    /// Устанавливает стиль.
+    /// </summary>
+    public void SetStyle(GraphEdgeStyle style)
+    {
+        LineType = style.LineType;
+        LineThickness = style.LineThickness;
+        LineColor = style.LineColor;
+    }
 }

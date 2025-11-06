@@ -1,7 +1,9 @@
 ﻿namespace GraphBuilder.Ncad.Commands;
 
 using GraphBuilder.Ncad.CustomEntities;
+using GraphBuilder.Ncad.Services;
 
+using Multicad;
 using Multicad.DatabaseServices;
 using Multicad.Runtime;
 
@@ -14,7 +16,12 @@ public class CreateGraphEdgeCommand
     public static void CreateGraphEdge()
     {
         var edge = new CadGraphEdge();
-        edge.PlaceObject();
+        if (edge.PlaceObject() != hresult.s_Ok)
+            return;
+
+        var edgeStyleService = new GraphEdgeStyleService();
+        edge.SetStyle(edgeStyleService.Load());
+
         McObjectManager.UpdateAll();
     }
 }
