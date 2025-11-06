@@ -1,40 +1,76 @@
 ﻿<common:BaseMcWindow x:Class="GraphBuilder.Ncad.Views.Vertex.VertexWindow"
-              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-              xmlns:local="clr-namespace:GraphBuilder.Ncad.Views.Vertex"
-              xmlns:customEntities="clr-namespace:GraphBuilder.Ncad.CustomEntities"
-              xmlns:collections="clr-namespace:System.Collections;assembly=System.Runtime"
-              xmlns:wpf="http://schemas.mcad.com/xaml/presentation"
-              xmlns:common="clr-namespace:GraphBuilder.Ncad.Views.Common"
-              mc:Ignorable="d"
-              SizeToContent="WidthAndHeight"
-              d:DataContext="{d:DesignInstance local:VertexVM, IsDesignTimeCreatable=False}"
-              Title="Редактирование вершины" MinWidth="300" MinHeight="200">
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:local="clr-namespace:GraphBuilder.Ncad.Views.Vertex"
+                     xmlns:customEntities="clr-namespace:GraphBuilder.Ncad.CustomEntities"
+                     xmlns:collections="clr-namespace:System.Collections;assembly=System.Runtime"
+                     xmlns:wpf="http://schemas.mcad.com/xaml/presentation"
+                     xmlns:common="clr-namespace:GraphBuilder.Ncad.Views.Common"
+                     xmlns:converters="clr-namespace:GraphBuilder.Ncad.Views.Converters"
+                     mc:Ignorable="d"
+                     d:DataContext="{d:DesignInstance local:VertexVM, IsDesignTimeCreatable=False}"
+                     Title="Редактирование вершины"
+                     MinWidth="300" MinHeight="200"
+                     Height="240" Width="600">
     <common:BaseMcWindow.Resources>
         <ResourceDictionary>
             <collections:ArrayList x:Key="VertexFormKinds">
-                <customEntities:VertexFormKind> Triangle </customEntities:VertexFormKind>
-                <customEntities:VertexFormKind> Circle </customEntities:VertexFormKind>
+                <customEntities:VertexFormKind>Triangle</customEntities:VertexFormKind>
+                <customEntities:VertexFormKind>Circle</customEntities:VertexFormKind>
             </collections:ArrayList>
+            <converters:ValueConverterGroup x:Key="NotNullToVisibleConverter">
+                <converters:NullBoolConverter />
+                <converters:InverseBooleanConverter />
+                <converters:BoolToVisible />
+            </converters:ValueConverterGroup>
         </ResourceDictionary>
     </common:BaseMcWindow.Resources>
     <Canvas Margin="8" TextBlock.FontSize="16">
         <StackPanel HorizontalAlignment="Left">
-            <TextBlock Text="Форма вершины:" Margin="0 0 0 8" />
-            <ComboBox
-                Padding="8"
-                SelectedItem="{Binding VertexFormKind}"
-                ItemsSource="{StaticResource VertexFormKinds}"
-                Width="120" />
+            <StackPanel HorizontalAlignment="Left" Margin="0 0 0 8">
+                <TextBlock Text="Форма вершины:" Margin="0 0 0 8" />
+                <ComboBox
+                    Padding="8"
+                    SelectedItem="{Binding VertexFormKind}"
+                    ItemsSource="{StaticResource VertexFormKinds}"
+                    Width="120" />
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                    <TextBlock
+                        Text="Файл вершины:" Margin="0 0 8 8" />
+                    <Button
+                        Padding="8"
+                        Margin="0 0 8 0"
+                        Content="Выбрать файл"
+                        Command="{Binding SelectFileCommand}"
+                        Width="120" />
+                    <Button
+                        Padding="8"
+                        Content="Очистить"
+                        Command="{Binding ClearFileCommand}"
+                        Width="120" />
+                </StackPanel>
+                <StackPanel
+                    Orientation="Horizontal"
+                    Visibility="{Binding FileInfo, 
+                        Converter={StaticResource NotNullToVisibleConverter}}">
+                    <TextBlock
+                        Text="Название файла:"
+                        Margin="0 0 8 8" />
+                    <TextBlock
+                        Text="{Binding FileInfo.FileName}" />
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
         <Button
             Content="Сохранить"
             Click="OnSave"
             Padding="8"
-            Canvas.Bottom="0" 
-            Canvas.Right="0" 
+            Canvas.Bottom="0"
+            Canvas.Right="0"
             HorizontalAlignment="Right" />
     </Canvas>
 </common:BaseMcWindow>

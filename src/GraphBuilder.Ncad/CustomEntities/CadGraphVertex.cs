@@ -3,6 +3,7 @@
 using System.Drawing;
 
 using GraphBuilder.Ncad.Abstractions;
+using GraphBuilder.Ncad.Models;
 using GraphBuilder.Ncad.Utils;
 using GraphBuilder.Ncad.Views.Vertex;
 
@@ -27,6 +28,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     public Point3d CenterPoint = new(0, 0, 0);
     private VertexFormKind _vertexFormKind;
     private bool _isSelected;
+    private VertexFileInfo? _fileInfo;
 
     /// <summary>
     /// Выбранная форма вершина.
@@ -38,6 +40,19 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
         {
             TryModify(0);
             _vertexFormKind = value;
+        }
+    }
+
+    /// <summary>
+    /// Прикрепленный файл к вершине.
+    /// </summary>
+    public VertexFileInfo? FileInfo
+    {
+        get => _fileInfo;
+        set
+        {
+            TryModify(0);
+            _fileInfo = value;
         }
     }
 
@@ -119,6 +134,14 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
             builder.DrawPolyline(trianglePoints.ToClosestArrayPoints());
         }
 
+        if (FileInfo != null)
+        {
+            builder.TextHeight = 30;
+            builder.Color = Color.White;
+            builder.DrawMText(CenterPoint 
+                              + new Vector3d(RADIUS * 0.9d, RADIUS * 0.9d, 0), Vector3d.XAxis, "есть файл");
+        }
+        
         if (IsSelected)
         {
             builder.Color = Color.Yellow;
@@ -136,12 +159,16 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     /// <inheritdoc />
     public override hresult OnMcDeserialization(McSerializationInfo info)
     {
-        if (!info.GetValue(nameof(CenterPoint), out CenterPoint))
-            return hresult.e_Fail;
-        if (!info.GetValue(nameof(_vertexFormKind), out int vertexFormType))
-            return hresult.e_Fail;
+        info.GetValue(nameof(CenterPoint), out CenterPoint);
+        if (info.GetValue(nameof(_vertexFormKind), out int vertexFormKind))
+            _vertexFormKind = (VertexFormKind)vertexFormKind;
 
-        _vertexFormKind = GetGraphVertexForm(vertexFormType);
+        var fileInfo = new VertexFileInfo();
+        if (info.GetObject(nameof(FileInfo), fileInfo))
+            _fileInfo = fileInfo;
+        else
+            _fileInfo = null;
+        
         return hresult.s_Ok;
     }
 
@@ -150,6 +177,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     {
         info.Add(nameof(CenterPoint), CenterPoint);
         info.Add(nameof(_vertexFormKind), (int)_vertexFormKind);
+        info.Add(nameof(FileInfo), _fileInfo);
 
         return hresult.s_Ok;
     }
@@ -199,12 +227,13 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     /// <inheritdoc />
     public override hresult OnEdit(Point3d pnt, EditFlags lFlag)
     {
-        var vertexVM = new VertexVM { VertexFormKind = _vertexFormKind };
+        var vertexVM = new VertexVM { VertexFormKind = _vertexFormKind, FileInfo = FileInfo };
         var vertexWindow = new VertexWindow { DataContext = vertexVM };
         if (vertexWindow.ShowDialog(McContext.MainWindowHandle) != true)
             return hresult.e_Abort;
 
         VertexFormKind = vertexVM.VertexFormKind;
+        FileInfo = vertexVM.FileInfo;
 
         return hresult.s_Ok;
     }

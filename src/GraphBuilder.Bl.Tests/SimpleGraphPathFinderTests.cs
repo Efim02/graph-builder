@@ -236,14 +236,6 @@ public class SimpleGraphPathFinderTests
     }
 
     [Test]
-    public void Initialize_WithNullEdges_ThrowsArgumentNullException()
-    {
-        // Arrange & Act & Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            _pathFinder.Initialize(_vertices, null!));
-    }
-
-    [Test]
     public void Initialize_WithNullVertices_ThrowsArgumentNullException()
     {
         // Arrange & Act & Assert

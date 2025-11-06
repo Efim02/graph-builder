@@ -9,6 +9,11 @@ GB_CREATE_GRAPH_VERTEX - создать точку графа. Точки соз
 <img src="doc/p1.png" height="200"/>
 <img src="doc/p0.png" height="200"/>
 
+Можно добавлять файл:
+
+<img src="doc/2025-11-06_17-57-10.png" height="200"/>
+
+
 GB_CREATE_GRAPH_EDGE - создание ребра между точками.
 
 GB_FIND_SHORTEST_WAY - поиск и выделение кратчайшего пути по 2-м вершинам.
