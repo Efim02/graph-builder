@@ -1,6 +1,7 @@
 ﻿namespace GraphBuilder.Ncad.CustomEntities;
 
 using System.Drawing;
+using System.Windows;
 
 using GraphBuilder.Ncad.Abstractions;
 using GraphBuilder.Ncad.Utils;
@@ -179,6 +180,13 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
         };
 
         return hresult.s_Ok;
+    }
+
+    public override hresult OnEdit()
+    {
+        McWin
+        
+        return base.OnEdit();
     }
 
     /// <summary>

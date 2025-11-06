@@ -4,6 +4,7 @@
         <Configurations>Debug;Release</Configurations>
 <!--        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>-->
 <!--        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>-->
+        <UseWpf>true</UseWpf>
         <DefineConstants>$(DefineConstants)TRACE;NCAD</DefineConstants>
     </PropertyGroup>
 
@@ -26,6 +27,14 @@
         </Reference>
         <Reference Include="mapimgd">
             <HintPath>..\..\lib\nanocad-25.0\multicad-api\mapimgd.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="mapiwpf">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\mapiwpf.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="mapiforms">
+            <HintPath>..\..\lib\nanocad-25.0\multicad-api\mapiforms.dll</HintPath>
             <Private>False</Private>
         </Reference>
     </ItemGroup>
