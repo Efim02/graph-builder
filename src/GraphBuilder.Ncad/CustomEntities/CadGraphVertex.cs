@@ -1,12 +1,13 @@
 ﻿namespace GraphBuilder.Ncad.CustomEntities;
 
 using System.Drawing;
-using System.Windows;
 
 using GraphBuilder.Ncad.Abstractions;
 using GraphBuilder.Ncad.Utils;
+using GraphBuilder.Ncad.Views.Vertex;
 
 using Multicad;
+using Multicad.AplicationServices;
 using Multicad.Constants;
 using Multicad.CustomObjectBase;
 using Multicad.DatabaseServices;
@@ -24,8 +25,21 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     private readonly List<IVertexObserver> _observers = new();
 
     public Point3d CenterPoint = new(0, 0, 0);
-    private VertexFormKind _vertexFormKind = VertexFormKind.Triangle;
+    private VertexFormKind _vertexFormKind;
     private bool _isSelected;
+
+    /// <summary>
+    /// Выбранная форма вершина.
+    /// </summary>
+    public VertexFormKind VertexFormKind
+    {
+        get => _vertexFormKind;
+        set
+        {
+            TryModify(0);
+            _vertexFormKind = value;
+        }
+    }
 
     /// <summary>
     /// Выделена ли точка.
@@ -88,10 +102,10 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
     public override void OnDraw(GeometryBuilder builder)
     {
         builder.Clear();
-        
+
         builder.LineType = LineTypes.ByObject;
         builder.LineWidth = LineWeights.ByObject;
-        
+
         if (_vertexFormKind == VertexFormKind.Circle)
         {
             builder.Color = Color.Blue;
@@ -104,7 +118,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
             var trianglePoints = TrianglePoints.CreateTrianglePointsByRadius(CenterPoint, RADIUS);
             builder.DrawPolyline(trianglePoints.ToClosestArrayPoints());
         }
-        
+
         if (IsSelected)
         {
             builder.Color = Color.Yellow;
@@ -182,18 +196,31 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
         return hresult.s_Ok;
     }
 
+    public override hresult OnEdit(Point3d pnt, EditFlags lFlag)
+    {
+        var vertexVM = new VertexVM { VertexFormKind = _vertexFormKind };
+        var vertexWindow = new VertexWindow { DataContext = vertexVM };
+        vertexWindow.ShowDialog(McContext.MainWindowHandle);
+
+        VertexFormKind = vertexVM.VertexFormKind;
+
+        return hresult.s_Ok;
+    }
+
+    /// <inheritdoc />
     public override hresult OnEdit()
     {
-        McWin
-        
-        return base.OnEdit();
+        var vertexVM = new VertexVM();
+        var vertexWindow = new VertexWindow { DataContext = vertexVM };
+        vertexWindow.ShowDialog(McContext.MainWindowHandle);
+
+        VertexFormKind = vertexVM.VertexFormKind;
+
+        return hresult.s_Ok;
     }
 
     /// <summary>
     /// Возвращает enum-представление формы вершины по её номеру.
     /// </summary>
-    private VertexFormKind GetGraphVertexForm(int type)
-    {
-        return type == 1 ? VertexFormKind.Circle : VertexFormKind.Triangle;
-    }
+    private VertexFormKind GetGraphVertexForm(int type) => type == 1 ? VertexFormKind.Circle : VertexFormKind.Triangle;
 }

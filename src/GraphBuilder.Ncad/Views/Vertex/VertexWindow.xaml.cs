@@ -10,4 +10,9 @@ public partial class VertexWindow : McWindow
     {
         InitializeComponent();
     }
+
+    private void OnSave(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }
