@@ -191,7 +191,6 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     public override void OnErase()
     {
         UnregisterFromVertices();
-        base.OnErase();
     }
 
     /// <inheritdoc />

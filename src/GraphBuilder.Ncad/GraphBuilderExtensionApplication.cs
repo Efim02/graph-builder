@@ -12,14 +12,22 @@ public class GraphBuilderExtensionApplication : IExtensionApplication
 {
     public void Initialize() => SafeUtils.Execute(() =>
     {
-        Application.DocumentManager.DocumentActivated += OnDocumentActivated;
+        Application.DocumentManager.DocumentCreated += OnDocumentOpened;
+        Application.DocumentManager.DocumentToBeDestroyed += OnDocumentClosing;
     });
+
+    private void OnDocumentClosing(object sender, DocumentCollectionEventArgs e)
+    {
+        // Отписываем ребра на изменения вершин.
+        var loadProjectResult = LoadProjectResult.Load();
+        loadProjectResult.GraphEdges.ForEach(edge => edge.UnregisterFromVertices());
+    }
 
     public void Terminate()
     {
     }
 
-    private void OnDocumentActivated(object sender, DocumentCollectionEventArgs e)
+    private void OnDocumentOpened(object sender, DocumentCollectionEventArgs e)
     {
         // Подписываем ребра на изменения вершин.
         var loadProjectResult = LoadProjectResult.Load();

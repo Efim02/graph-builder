@@ -1,6 +1,7 @@
 ﻿namespace GraphBuilder.Ncad.Commands;
 
 using GraphBuilder.Ncad.CustomEntities;
+using GraphBuilder.Ncad.Services;
 
 using Multicad;
 using Multicad.AplicationServices;
@@ -25,6 +26,10 @@ public class CreateGraphVertexCommand
             if (lastVertex != null)
             {
                 var edge = new CadGraphEdge(lastVertex.ID, vertexOrNull.ID);
+                
+                var edgeStyleService = new GraphEdgeStyleService();
+                edge.SetStyle(edgeStyleService.Load());
+
                 edge.DbEntity.AddToCurrentDocument();
             }
 
