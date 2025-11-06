@@ -22,6 +22,9 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     private List<Point3d> _intermediatePoints = new();
     private McObjectId _startVertexId;
     private bool _isSelected;
+    private Color _lineColor;
+    private int _lineThickness;
+    private string _lineType;
 
     public CadGraphEdge()
     {
@@ -63,6 +66,45 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     }
 
     /// <summary>
+    /// Тип линии.
+    /// </summary>
+    public string LineType
+    {
+        get => _lineType;
+        set
+        {
+            TryModify(0);
+            _lineType = value;
+        }
+    }
+
+    /// <summary>
+    /// Толщина линии.
+    /// </summary>
+    public int LineThickness
+    {
+        get => _lineThickness;
+        set
+        {
+            TryModify(0);
+            _lineThickness = value;
+        }
+    }
+
+    /// <summary>
+    /// Толщина линии.
+    /// </summary>
+    public Color LineColor
+    {
+        get => _lineColor;
+        set
+        {
+            TryModify(0);
+            _lineColor = value;
+        }
+    }
+
+    /// <summary>
     /// Выделено ли ребро.
     /// </summary>
     public bool IsSelected
@@ -78,10 +120,10 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     /// <inheritdoc />
     public void OnVertexErased(CadGraphVertex vertex)
     {
-        if (StartVertex?.ID == vertex.ID)
+        if (StartVertex.ID == vertex.ID)
             _startVertexId = McObjectId.Null;
 
-        if (EndVertex?.ID == vertex.ID)
+        if (EndVertex.ID == vertex.ID)
             _endVertexId = McObjectId.Null;
 
         if (IsOrphanedEdge())
@@ -104,7 +146,7 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
         {
             var index = i;
             info.AppendGrip(new McSmartGrip<CadGraphEdge>(_intermediatePoints[index],
-                (obj, grip, offset) =>
+                (obj, _, offset) =>
                 {
                     obj.TryModify(0);
                     obj._intermediatePoints[index] += offset;
@@ -131,9 +173,10 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
         var points = GetEdgePoints();
         if (points.Count <= 1)
             return;
-        
-        builder.LineType = LineTypes.ByObject;
-        builder.LineWidth = LineWeights.ByObject;
+
+        builder.StrLineType = LineType;
+        builder.LineWidth = LineThickness;
+        builder.Color = LineColor;
         builder.DrawPolyline(points.ToArray());
 
         if (IsSelected)
@@ -155,7 +198,7 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     {
         if (null == info)
             return hresult.e_InvalidArg;
-        
+
         if (!info.GetValue(nameof(_startVertexId), out _startVertexId))
             return hresult.e_Fail;
         if (!info.GetValue(nameof(_endVertexId), out _endVertexId))
@@ -164,6 +207,9 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
             return hresult.e_Fail;
         if (!info.GetValue(nameof(_intermediatePoints), out Point3d[] points))
             return hresult.e_Fail;
+        info.GetValue(nameof(_lineColor), out _lineColor);
+        info.GetValue(nameof(_lineType), out _lineType);
+        info.GetValue(nameof(_lineThickness), out _lineThickness);
 
         _intermediatePoints = new List<Point3d>(points);
         InvalidateLength();
@@ -176,11 +222,14 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     {
         if (null == info)
             return hresult.e_InvalidArg;
-        
+
         info.Add(nameof(_startVertexId), _startVertexId);
         info.Add(nameof(_endVertexId), _endVertexId);
         info.Add(nameof(_isSelected), _isSelected);
         info.Add(nameof(_intermediatePoints), _intermediatePoints.ToArray());
+        info.Add(nameof(_lineColor), _lineColor);
+        info.Add(nameof(_lineType), _lineType);
+        info.Add(nameof(_lineThickness), _lineThickness);
 
         return hresult.s_Ok;
     }
@@ -238,9 +287,23 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
             DbEntity?.Erase();
             return;
         }
-        
+
         InvalidateLength();
         DbEntity?.Update();
+    }
+
+    /// <summary>
+    /// Регестрирует вершины.
+    /// </summary>
+    public void RegisterWithVertices()
+    {
+        var startVertex = GetStartVertex();
+        var endVertex = GetEndVertex();
+
+        startVertex?.AddObserver(this);
+        endVertex?.AddObserver(this);
+
+        UpdateGeometry();
     }
 
     /// <summary>
@@ -282,38 +345,15 @@ public class CadGraphEdge : McCustomBase, IVertexObserver, ISelectable
     /// <summary>
     /// Возвращает вершину конца.
     /// </summary>
-    private CadGraphVertex? GetEndVertex()
-    {
-        return McObjectManager.GetObject(_endVertexId) as CadGraphVertex;
-    }
+    private CadGraphVertex? GetEndVertex() => McObjectManager.GetObject(_endVertexId) as CadGraphVertex;
 
     /// <summary>
     /// Возвращает вершину начала.
     /// </summary>
-    private CadGraphVertex? GetStartVertex()
-    {
-        return McObjectManager.GetObject(_startVertexId) as CadGraphVertex;
-    }
+    private CadGraphVertex? GetStartVertex() => McObjectManager.GetObject(_startVertexId) as CadGraphVertex;
 
     /// <summary>
     /// Проверяет, является ли ребро "Висячим"
     /// </summary>
-    private bool IsOrphanedEdge()
-    {
-        return GetStartVertex() == null || GetEndVertex() == null;
-    }
-
-    /// <summary>
-    /// Регестрирует вершины.
-    /// </summary>
-    public void RegisterWithVertices()
-    {
-        var startVertex = GetStartVertex();
-        var endVertex = GetEndVertex();
-        
-        startVertex?.AddObserver(this);
-        endVertex?.AddObserver(this);
-
-        UpdateGeometry();
-    }
+    private bool IsOrphanedEdge() => GetStartVertex() == null || GetEndVertex() == null;
 }

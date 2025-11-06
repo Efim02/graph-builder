@@ -6,6 +6,9 @@
 
 GB_CREATE_GRAPH_VERTEX - создать точку графа. Точки создаются последовательно.
 
+<img src="doc/p1.png" height="200"/>
+<img src="doc/p0.png" height="200"/>
+
 GB_CREATE_GRAPH_EDGE - создание ребра между точками.
 
 GB_FIND_SHORTEST_WAY - поиск и выделение кратчайшего пути по 2-м вершинам.
@@ -17,3 +20,5 @@ GB_CLEAR_SHORTEST_WAY - очистка выделения кратчайшего
 # Использование
 
 Редактирование вида вершины - двойным кликом по вершине.
+
+<img src="doc/img.png" height="300"/>

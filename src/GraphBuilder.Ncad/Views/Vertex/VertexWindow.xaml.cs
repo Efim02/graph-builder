@@ -1,18 +1,11 @@
 ﻿namespace GraphBuilder.Ncad.Views.Vertex;
 
-using System.Windows;
+using GraphBuilder.Ncad.Views.Common;
 
-using Multicad.Wpf;
-
-public partial class VertexWindow : McWindow
+public partial class VertexWindow : BaseMcWindow
 {
     public VertexWindow()
     {
         InitializeComponent();
-    }
-
-    private void OnSave(object sender, RoutedEventArgs e)
-    {
-        Close();
     }
 }

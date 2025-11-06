@@ -196,23 +196,13 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
         return hresult.s_Ok;
     }
 
+    /// <inheritdoc />
     public override hresult OnEdit(Point3d pnt, EditFlags lFlag)
     {
         var vertexVM = new VertexVM { VertexFormKind = _vertexFormKind };
         var vertexWindow = new VertexWindow { DataContext = vertexVM };
-        vertexWindow.ShowDialog(McContext.MainWindowHandle);
-
-        VertexFormKind = vertexVM.VertexFormKind;
-
-        return hresult.s_Ok;
-    }
-
-    /// <inheritdoc />
-    public override hresult OnEdit()
-    {
-        var vertexVM = new VertexVM();
-        var vertexWindow = new VertexWindow { DataContext = vertexVM };
-        vertexWindow.ShowDialog(McContext.MainWindowHandle);
+        if (vertexWindow.ShowDialog(McContext.MainWindowHandle) != true)
+            return hresult.e_Abort;
 
         VertexFormKind = vertexVM.VertexFormKind;
 
