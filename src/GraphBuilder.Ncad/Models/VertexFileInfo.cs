@@ -7,8 +7,8 @@ using Multicad;
 /// </summary>
 public class VertexFileInfo : IMcSerializable
 {
-    private byte[] _data = null!;
-    private string _fileName = null!;
+    private byte[]? _data;
+    private string? _fileName;
 
     /// <summary>
     /// Данные файла.
@@ -28,6 +28,8 @@ public class VertexFileInfo : IMcSerializable
         set => _fileName = value;
     }
 
+    public bool IsFilled => _data != null && !string.IsNullOrWhiteSpace(_fileName);
+    
     public hresult OnMcDeserialization(McSerializationInfo info)
     {
         info.GetValue(nameof(Data), out _data);

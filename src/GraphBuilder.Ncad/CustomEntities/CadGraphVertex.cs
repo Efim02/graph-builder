@@ -164,7 +164,7 @@ public class CadGraphVertex : McCustomBase, IVertexObservable, ISelectable
             _vertexFormKind = (VertexFormKind)vertexFormKind;
 
         var fileInfo = new VertexFileInfo();
-        if (info.GetObject(nameof(FileInfo), fileInfo))
+        if (info.GetObject(nameof(FileInfo), fileInfo) && fileInfo.IsFilled)
             _fileInfo = fileInfo;
         else
             _fileInfo = null;
